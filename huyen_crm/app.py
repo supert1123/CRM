@@ -3,6 +3,7 @@ from flask import Flask, request, redirect, url_for , jsonify , send_file ,send_
 from werkzeug.utils import secure_filename
 from crm import *
 import json
+from fastapi import FastAPI
 
 class DataModel:
     def __init__(self, result, message, item):

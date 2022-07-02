@@ -9,6 +9,8 @@ import re
 import docx
 from docx.shared import Pt
 from docx.enum.style import WD_STYLE_TYPE
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+
 
 """
 Testing iter_block_items()
@@ -116,22 +118,39 @@ def findColor(filename,key,newName):
     doc.save(newName)
     return countKey,key
 
-def replace_string(key,value,NumberList,countKey,p):
-    lenght = len(key)# độ dài của key
-    tmp_padding = len(key) - len (value)# so sánh độ dài của key và value
-    matchs = re.findall(key,p.text,re.IGNORECASE) #khớp không phân biệt
-    lines = p.runs 
-    for j in range(len(lines)):# cho j vào trong các dòng
-        padding = 0 #khởi tạo padding
-        line = lines[j].text 
-        for i in range(len(line)-lenght+1): #tạo i là khoảng thay thế của value
-            text = line[i - padding : i + lenght - padding] #thay thế value vào vị trí của key khớp khoảng cách khi thay đổi
-            if text in matchs:
-                if countKey in NumberList:
-                    text = line.replace(text, value) # bắt đầu thay đổi(hàm replace giữ lại font chứ ban đầu)
-                    padding -= tmp_padding # thay thế khoảng cách của từ
-                    lines[j].text = text #dòng text chứa value
-                countKey +=1 
+def replace_string(key,value,numberList,countKey,p):
+##    split đoạn văn và key thành list
+##    kiểm tra xem key có xuất hiện trong đoạn không
+##    đếm số lần xuất hiện của key, nếu thứ tự nằm trong numberList thì thay đổi key
+##    thay đổi: xóa các từ khác, giữ lại từ đầu tiên của key, thay bằng value
+##    chuyển đoạn văn từ list về đoạn
+##    
+##    input: key, từ để đổi, danh sách vị trí đổi, số thứ tự key, đoạn văn chứa key
+##    output: đoạn văn đã được đổi từ ở vị trí chỉ định, số thứ tự key
+    line_split = p.text.split() # split đoạn
+    key_split = key.split() # split key
+    len_key = len(key_split)
+    for i in range(len(line_split)):
+        if re.search(key_split[0],line_split[i],re.IGNORECASE):# nếu từ đầu trong key xuất hiện
+            count = 0 # đếm từ trong key
+            while count < len_key:
+                if re.search(key_split[count],line_split[i+count],re.IGNORECASE): ##so khớp không phân biệt hoa thường
+                    count+=1 # đếm xem các từ trong key xuất hiện đủ chưa
+                else:
+                    break
+            if count == len_key: # nếu đủ
+                countKey += 1
+                #punctuation =""
+                #if re.match(r'\S', p.text): #so khớp với ký tự không phải chữ
+                    #punctuation = line_split[i+count-1][-1] # dấu câu
+                if countKey in numberList:  # bắt đầu thay đổi ở các vị trí cần thiết
+                    count_1 = 1
+                    while count_1 < len_key:
+                        line_split[i+count_1] = "" #thêm u ở phía trước để xử lý ký tự tiếng việt nhá
+                        count_1+=1
+                    line_split[i] = value #+punctuation
+                p.text = u" ".join(line_split)
+                p.text = u" ".join(p.text.split()) #loai bỏ khoảng trắng trùng lặp
     return countKey
 
 def replace(filename,key,value,numberList,output_file):
@@ -139,21 +158,38 @@ def replace(filename,key,value,numberList,output_file):
 ##    tìm và thay thế từ ở vị trí chỉ định
 ##    input: tên file, từ muốn đổi, từ để đổi, danh sách vị trí đổi
 ##    output: file word đã được thay từ ở những vị trí chỉ định
-    countKey = 1 # khởi tạo số thứ tự key
+    countKey = 0 # khởi tạo số thứ tự key
     doc = Document(filename)
+    par = doc.paragraphs[0]
+    #Tạo Style 'Time new Roman' và  đưa dòng có key
+    styles = doc.styles
+    style = doc.styles['Normal']
+    font = style.font
+    if f"'{par.style.font.name}'" != None:
+        font.name = f"'{par.style.font.name}'"
+    sizes = Size(filename)
+    run = 0
+    for p in doc.paragraphs:
+        for i in p.runs:
+            if i.font.size != None:
+                font.size = Pt(sizes[run])
+                run += 1
     for block in iter_block_items(doc):
         if isinstance(block, Paragraph):
-            if re.findall(key,block.text,re.IGNORECASE): #so khớp không phân biệt hoa thường
-                #print(re.findall(key,block.text,re.IGNORECASE))
+            if re.search(key,block.text,re.IGNORECASE): #so khớp không phân biệt hoa thường
                 countKey = replace_string(key,value,numberList,countKey,block)
         else:
-                for row in block.rows:
-                    for cell in iter_unique_cells(row):
-                        for p in cell.paragraphs:
-                            if re.findall(key,p.text,re.IGNORECASE): #so khớp không phân biệt hoa thường
-                                 #print(re.search(key,p.text,re.IGNORECASE))
-                                 countKey = replace_string(key,value,numberList,countKey,p)
+            for row in block.rows:
+                for p in row.cells:
+                    if re.search(key,p.text,re.IGNORECASE): #so khớp không phân biệt hoa thường
+                        countKey = replace_string(key,value,numberList,countKey,p)
+                        #Đưa style vào từ chuyển đổi   
+                        styles = doc.styles
+                        style = doc.styles['Normal']
+                        font = style.font
+                        font.name = f"'{par.style.font.name}'" 
     doc.save(output_file)
+
 '''input_file = 'output/phong8.docx'
 input_file = os.path.abspath(input_file)
 #file = os.getcwd() + "/" + input_file
