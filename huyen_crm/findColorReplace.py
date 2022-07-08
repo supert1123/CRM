@@ -131,10 +131,10 @@ def replace_string(key,value,numberList,countKey,p):
     key_split = key.split() # split key
     len_key = len(key_split)
     for i in range(len(line_split)):
-        if re.search(key_split[0],line_split[i],re.IGNORECASE):# nếu từ đầu trong key xuất hiện
+        if re.findall(key_split[0],line_split[i],re.IGNORECASE):# nếu từ đầu trong key xuất hiện
             count = 0 # đếm từ trong key
             while count < len_key:
-                if re.search(key_split[count],line_split[i+count],re.IGNORECASE): ##so khớp không phân biệt hoa thường
+                if re.findall(key_split[count],line_split[i+count],re.IGNORECASE): ##so khớp không phân biệt hoa thường
                     count+=1 # đếm xem các từ trong key xuất hiện đủ chưa
                 else:
                     break
@@ -176,18 +176,19 @@ def replace(filename,key,value,numberList,output_file):
                 run += 1
     for block in iter_block_items(doc):
         if isinstance(block, Paragraph):
-            if re.search(key,block.text,re.IGNORECASE): #so khớp không phân biệt hoa thường
+            if re.findall(key,block.text,re.IGNORECASE): #so khớp không phân biệt hoa thường
                 countKey = replace_string(key,value,numberList,countKey,block)
         else:
             for row in block.rows:
-                for p in row.cells:
-                    if re.search(key,p.text,re.IGNORECASE): #so khớp không phân biệt hoa thường
-                        countKey = replace_string(key,value,numberList,countKey,p)
-                        #Đưa style vào từ chuyển đổi   
-                        styles = doc.styles
-                        style = doc.styles['Normal']
-                        font = style.font
-                        font.name = f"'{par.style.font.name}'" 
+                for cell in iter_unique_cells(row):
+                    for p in cell.paragraphs:
+                        if re.findall(key,p.text,re.IGNORECASE): #so khớp không phân biệt hoa thường
+                                #print(re.search(key,p.text,re.IGNORECASE))
+                                countKey = replace_string(key,value,numberList,countKey,p)                                #Đưa style vào từ chuyển đổi   
+                                styles = doc.styles
+                                style = doc.styles['Normal']
+                                font = style.font
+                                font.name = f"'{par.style.font.name}'" 
     doc.save(output_file)
 
 '''input_file = 'output/phong8.docx'
