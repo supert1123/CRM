@@ -113,10 +113,9 @@ def findColor(filename,key,newName):
                     if len(match)>0: #so khớp không phân biệt hoa thường
                         p.text = " "
                         p = p.add_paragraph()
-                        print(p)
                         countKey = color_string(match,countKey,p1,p)
     doc.save(newName)
-    return countKey,key
+    return countKey
 
 def replace_string(key,value,numberList,countKey,p):
 ##    split đoạn văn và key thành list
@@ -149,8 +148,8 @@ def replace_string(key,value,numberList,countKey,p):
                         line_split[i+count_1] = "" #thêm u ở phía trước để xử lý ký tự tiếng việt nhá
                         count_1+=1
                     line_split[i] = value #+punctuation
-                p.text = u" ".join(line_split)
-                p.text = u" ".join(p.text.split()) #loai bỏ khoảng trắng trùng lặp
+                    p.text = u" ".join(line_split)
+                    p.text = u" ".join(p.text.split()) #loai bỏ khoảng trắng trùng lặp
     return countKey
 
 def replace(filename,key,value,numberList,output_file):
