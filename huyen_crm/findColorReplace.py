@@ -116,7 +116,16 @@ def findColor(filename,key,newName):
     doc.save(newName)
     return countKey
 
-def replace_string(key,value,numberList,countKey,p):
+# def replace_string(key,value,numberList,countKey,p):
+"""     
+{
+    'chiết khấu':{
+        'abc': [1, 2 ,3],
+        'xyz': [4,5,6]
+    }
+}
+"""
+def replace_string(dict_key, countKey,p):
     """    
     split đoạn văn và key thành list
     kiểm tra xem key có xuất hiện trong đoạn không
@@ -127,6 +136,12 @@ def replace_string(key,value,numberList,countKey,p):
     input: key, từ để đổi, danh sách vị trí đổi, số thứ tự key, đoạn văn chứa key
     output: đoạn văn đã được đổi từ ở vị trí chỉ định, số thứ tự key
     """
+    numberList = [ ]
+    for k in dict_key:
+        key = k
+        for v in dict_key[k]:
+            for numList in dict_key[k][v]:
+                numberList.append(numList)
     line_split = p.text.split() # split đoạn
     key_split = key.split() # split key
     len_key = len(key_split)
@@ -148,6 +163,11 @@ def replace_string(key,value,numberList,countKey,p):
                     while count_1 < len_key:
                         line_split[i+count_1] = "" #thêm u ở phía trước để xử lý ký tự tiếng việt nhá
                         count_1+=1
+                    value = ''
+                    for k in dict_key:
+                        for v in dict_key[k]:
+                            if countKey in dict_key[k][v]:
+                                value = v
                     line_split[i] = value #+punctuation
                     # run = p.add_run()
                     # font = run.font                    

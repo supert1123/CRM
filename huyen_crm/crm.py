@@ -45,7 +45,7 @@ def stage2(input_file,key):
         os.remove(file)
     return img_org_base64, countKey
     
-def stage3(input_file,key,value,numberList,count):
+def stage3(input_file,dict_key,count):
 ##    Bước thứ 3
 ##    Tìm kiếm và thay thế key bằng value ở những vị trí trong numberList
 ##    lưu lại file word
@@ -67,7 +67,7 @@ def stage3(input_file,key,value,numberList,count):
     if count != 1:
         output_file = input_file_name+input_file_end
     
-    replace(input_file,key,value,numberList,output_file)
+    replace(input_file,dict_key,output_file)
     output_file,img_org_base64 = input_processing(output_file)
     # Xóa file pdf,folder chứa ảnh khi đã chuyển qua base64 xong
     deleteFileFolder(input_file_name)
