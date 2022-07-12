@@ -207,14 +207,15 @@ def check_font(para):
     return flag
 
 
-def replace(filename,key,value,numberList,output_file):
+def replace(filename,dict_key,output_file):
     """
     hàm duyệt từng đoạn trong file
     tìm và thay thế từ ở vị trí chỉ định
     input: tên file, từ muốn đổi, từ để đổi, danh sách vị trí đổi
     output: file word đã được thay từ ở những vị trí chỉ định
     """
-
+    for d in dict_key:
+        key = d
     countKey = 0 # khởi tạo số thứ tự key
     doc = Document(filename)
     par = doc.paragraphs[0]
@@ -234,14 +235,14 @@ def replace(filename,key,value,numberList,output_file):
     for block in iter_block_items(doc):
         if isinstance(block, Paragraph):
             if re.findall(key,block.text,re.IGNORECASE): #so khớp không phân biệt hoa thường
-                countKey = replace_string(key,value,numberList,countKey,block)
+                countKey = replace_string(dict_key,countKey,block)
         else:
             for row in block.rows:
                 for cell in iter_unique_cells(row):
                     for p in cell.paragraphs:
                             if re.findall(key,p.text,re.IGNORECASE): #so khớp không phân biệt hoa thường
                                     #print(re.search(key,p.text,re.IGNORECASE))
-                                    countKey = replace_string(key,value,numberList,countKey,p)                                
+                                    countKey = replace_string(dict_key,countKey,p)                                
                                     #Đưa style vào từ chuyển đổi   
                                     styles = doc.styles
                                     style = doc.styles['Normal']

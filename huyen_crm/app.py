@@ -113,18 +113,20 @@ def replace():
     input_file = request.args.get('input_file')
     contents = request.json
     count = 0
-    dict_keys = {}
+    dict_keys = []
     for content in contents:
+        a_key = {}
         # count += 1
         key = content['name']
         value = content['replace_with']
         numberList = content['index']
-        if key not in dict_keys:
-            dict_keys[key] = {}
-        if value not in dict_keys:
-            dict_keys[key][value] = []
-        for num in numberList:
-            dict_keys[key][value].append(num)
+        checkin = False
+        for i in range(len(dict_keys)):
+            if key in dict_keys[i]:
+                dict_keys[i][key][value]=[num for num in numberList]
+                checkin = True
+        if not checkin:
+            dict_keys.append({key:{value:numberList}})
     for dict_key in dict_keys:
         img_org_base64,input_file = stage3(input_file,dict_key,count)
     #key = contents[0]['name']
