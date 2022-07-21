@@ -22,7 +22,7 @@ def input_file_processing(input_file):
     # convert trên linux
     LIBRE_OFFICE = r"/usr/bin/lowriter"
     p = Popen([LIBRE_OFFICE, '--headless', '--convert-to', 'pdf', '--outdir',
-               out_folder, input_file])
+               out_folder, input_file])       
     #print([LIBRE_OFFICE, '--convert-to', 'pdf', input_file])
     p.communicate()
     

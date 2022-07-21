@@ -171,25 +171,25 @@ def replace_string(dict_key, countKey,p):
                     line_split[i] = value #+punctuation
                     # run = p.add_run()
                     # font = run.font                    
-                    for idx in range(len(p.runs)): #khởi tạo idx
-                        if idx<len(line_split)-1: # so sánh giá trị của idx
-                            p.runs[idx].text = line_split[idx] + ' '  #tạo đoạn thay đổi thêm vào
-                        elif idx==len(line_split)-1:      #so sánh thay đổi
-                            p.runs[idx].text = u" ".join(line_split[idx:])   #Thay đổi
-                            p.runs[idx].text = u" ".join(p.runs[idx].text.split()) 
-                        else:  # Xét định dạng của đoạn thay đổi
-                            p.runs[idx].text = ''     
-                        flag = check_font(p.runs[idx])
-                        if flag['bold']:    
-                            p.runs[idx].font.bold = True
-                        if flag['italic']:
-                            p.runs[idx].font.italic = True
-                        if flag['underline']:
-                            p.runs[idx].font.underline = True
+                    # for idx in range(len(p.runs)): #khởi tạo idx
+                    #     if idx<len(line_split)-1: # so sánh giá trị của idx
+                    #         p.runs[idx].text = line_split[idx] + ' '  #tạo đoạn thay đổi thêm vào
+                    #     elif idx==len(line_split)-1:      #so sánh thay đổi
+                    #         p.runs[idx].text = u" ".join(line_split[idx:])   #Thay đổi
+                    #         p.runs[idx].text = u" ".join(p.runs[idx].text.split()) 
+                    #     else:  # Xét định dạng của đoạn thay đổi
+                    #         p.runs[idx].text = ''     
+                    #     flag = check_font(p.runs[idx])
+                    #     if flag['bold']:    
+                    #         p.runs[idx].font.bold = True
+                    #     if flag['italic']:
+                    #         p.runs[idx].font.italic = True
+                    #     if flag['underline']:
+                    #         p.runs[idx].font.underline = True
                     # run.text = u" ".join(line_split)
                     # a = run.text
-                    # run.text = u" ".join(a.split()) #loai bỏ khoảng trắng trùng lặp   
-                    # p.text = u" ".join(p.text.split())            
+                    p.text = u" ".join(line_split)   
+                    p.text = u" ".join(p.text.split())     #loai bỏ khoảng trắng trùng lặp        
     return countKey
 
 def check_font(para):
@@ -223,8 +223,8 @@ def replace(filename,dict_key,output_file):
     styles = doc.styles
     style = doc.styles['Normal']
     font = style.font
-    if f"'{par.style.font.name}'" != None:
-        font.name = f"'{par.style.font.name}'"
+    if f'{par.style.font.name}' != None:
+        font.name = f'{par.style.font.name}'
     sizes = Size(filename)
     run = 0
     for p in doc.paragraphs:
@@ -247,9 +247,8 @@ def replace(filename,dict_key,output_file):
                                     styles = doc.styles
                                     style = doc.styles['Normal']
                                     font = style.font
-                                    font.name = f"'{par.style.font.name}'" 
-                                    font.name = f"'{par.style.font.name}'" 
-                                    font.name = f"'{par.style.font.name}'" 
+                                    font.name = f'{par.style.font.name}'
+
     doc.save(output_file)
 
 '''input_file = 'output/phong8.docx'
